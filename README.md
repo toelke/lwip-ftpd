@@ -17,4 +17,4 @@ The translation-layer
 
 All code in this repository is licensed under a 3-clause BSD license
 
-Patches, comments and pull-requests are wellcome.
+Patches, comments and pull-requests are welcome.
