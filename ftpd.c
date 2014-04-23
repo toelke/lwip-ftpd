@@ -41,13 +41,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <malloc.h>
-#ifdef _WIN32
-#include <string.h>
-#endif
 #include <ctype.h>
-#include <errno.h>
-#include <time.h>
+#include <string.h>
 
 #include "vfs.h"
 
@@ -60,6 +55,10 @@ int dbg_printf(const char *fmt, ...);
 #define dbg_printf(f, ...) /* */
 #endif
 #endif
+
+#define EINVAL 1
+#define ENOMEM 2
+#define ENODEV 3
 
 #define msg110 "110 MARK %s = %s."
 /*
@@ -721,7 +720,7 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	sfifo_init(&fsm->datafs->fifo, 2000);
 
 	fsm->datapcb = tcp_new();
-	tcp_bind(fsm->datapcb, &pcb->local_ip, 20);
+	tcp_bind(fsm->datapcb, (ip_addr_t*)&pcb->local_ip, 20);
 	/* Tell TCP that this is the structure we wish to be passed for our
 	   callbacks. */
 	tcp_arg(fsm->datapcb, fsm->datafs);
@@ -934,7 +933,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 			port = 4096;
 
 		fsm->dataport = port;
-		err = tcp_bind(fsm->datapcb, &pcb->local_ip, fsm->dataport);
+		err = tcp_bind(fsm->datapcb, (ip_addr_t*)&pcb->local_ip, fsm->dataport);
 		if (err == ERR_OK)
 			break;
 		if (start_port == port)
