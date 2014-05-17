@@ -41,7 +41,7 @@ typedef struct {
 typedef DIR vfs_dir_t;
 typedef FIL vfs_file_t;
 typedef struct {
-	int st_size;
+	long st_size;
 	char st_mode;
 	time_t st_mtime;
 } vfs_stat_t;

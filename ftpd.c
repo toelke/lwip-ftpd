@@ -598,7 +598,7 @@ static err_t ftpd_datarecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t
 
 	if (err == ERR_OK && p != NULL) {
 		struct pbuf *q;
-		u16_t tot_len;
+		u16_t tot_len = 0;
 
 		for (q = p; q != NULL; q = q->next) {
 			int len;
@@ -793,7 +793,7 @@ static void cmd_pwd(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *
 {
 	char *path;
 
-	if (path = vfs_getcwd(fsm->vfs, NULL, 0)) {
+	if ((path = vfs_getcwd(fsm->vfs, NULL, 0))) {
 		send_msg(pcb, fsm, msg257PWD, path);
 		free(path);
 	}
@@ -1118,32 +1118,32 @@ struct ftpd_command {
 };
 
 static struct ftpd_command ftpd_commands[] = {
-	"USER", cmd_user,
-	"PASS", cmd_pass,
-	"PORT", cmd_port,
-	"QUIT", cmd_quit,
-	"CWD", cmd_cwd,
-	"CDUP", cmd_cdup,
-	"PWD", cmd_pwd,
-	"XPWD", cmd_pwd,
-	"NLST", cmd_nlst,
-	"LIST", cmd_list,
-	"RETR", cmd_retr,
-	"STOR", cmd_stor,
-	"NOOP", cmd_noop,
-	"SYST", cmd_syst,
-	"ABOR", cmd_abrt,
-	"TYPE", cmd_type,
-	"MODE", cmd_mode,
-	"RNFR", cmd_rnfr,
-	"RNTO", cmd_rnto,
-	"MKD", cmd_mkd,
-	"XMKD", cmd_mkd,
-	"RMD", cmd_rmd,
-	"XRMD", cmd_rmd,
-	"DELE", cmd_dele,
-	//"PASV", cmd_pasv,
-	NULL
+	{"USER", cmd_user},
+	{"PASS", cmd_pass},
+	{"PORT", cmd_port},
+	{"QUIT", cmd_quit},
+	{"CWD", cmd_cwd},
+	{"CDUP", cmd_cdup},
+	{"PWD", cmd_pwd},
+	{"XPWD", cmd_pwd},
+	{"NLST", cmd_nlst},
+	{"LIST", cmd_list},
+	{"RETR", cmd_retr},
+	{"STOR", cmd_stor},
+	{"NOOP", cmd_noop},
+	{"SYST", cmd_syst},
+	{"ABOR", cmd_abrt},
+	{"TYPE", cmd_type},
+	{"MODE", cmd_mode},
+	{"RNFR", cmd_rnfr},
+	{"RNTO", cmd_rnto},
+	{"MKD", cmd_mkd},
+	{"XMKD", cmd_mkd},
+	{"RMD", cmd_rmd},
+	{"XRMD", cmd_rmd},
+	{"DELE", cmd_dele},
+	//{"PASV", cmd_pasv},
+	{NULL, NULL}
 };
 
 static void send_msgdata(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
