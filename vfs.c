@@ -34,7 +34,6 @@
  */
 vfs_dirent_t dir_ent;
 
-/* This file object is returned when the filesystem is opened */
 FIL guard_for_the_whole_fs;
 
 int vfs_read (void* buffer, int dummy, int len, vfs_file_t* file) {
@@ -69,6 +68,7 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st) {
 
 void vfs_close(vfs_t* vfs) {
 	if (vfs != &guard_for_the_whole_fs) {
+		/* Close a file */
 		f_close(vfs);
 	}
 }
