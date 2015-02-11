@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Philipp Tölke
+/* Copyright (c) 2013, Philipp TÃ¶lke
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,6 +71,7 @@ void vfs_close(vfs_t* vfs) {
 		/* Close a file */
 		f_close(vfs);
 	}
+	free(vfs);
 }
 
 int vfs_write (void* buffer, int dummy, int len, vfs_file_t* file) {
