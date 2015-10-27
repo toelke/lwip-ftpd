@@ -948,6 +948,8 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		}
 	}
 
+	fsm->datafs->msgfs = fsm;
+
 	temppcb = tcp_listen(fsm->datapcb);
 	if (!temppcb) {
 		ftpd_dataclose(fsm->datapcb, fsm->datafs);
@@ -959,7 +961,6 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 	fsm->passive = 1;
 	fsm->datafs->connected = 0;
-	fsm->datafs->msgfs = fsm;
 	fsm->datafs->msgpcb = pcb;
 
 	/* Tell TCP that this is the structure we wish to be passed for our
