@@ -341,7 +341,7 @@ struct ftpd_msgstate {
 	enum ftpd_state_e state;
 	sfifo_t fifo;
 	vfs_t *vfs;
-	struct ip_addr dataip;
+	struct ip4_addr dataip;
 	u16_t dataport;
 	struct tcp_pcb *datapcb;
 	struct ftpd_datastate *datafs;
@@ -679,7 +679,10 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	/* Tell TCP that this is the structure we wish to be passed for our
 	   callbacks. */
 	tcp_arg(fsm->datapcb, fsm->datafs);
-	tcp_connect(fsm->datapcb, &fsm->dataip, fsm->dataport, ftpd_dataconnected);
+	ip_addr_t dataip;
+	IP_SET_TYPE_VAL(dataip, IPADDR_TYPE_V4);
+	ip4_addr_copy(*ip_2_ip4(&dataip), fsm->dataip);
+	tcp_connect(fsm->datapcb, &dataip, fsm->dataport, ftpd_dataconnected);
 
 	return 0;
 }
@@ -923,7 +926,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 	tcp_arg(fsm->datapcb, fsm->datafs);
 
 	tcp_accept(fsm->datapcb, ftpd_dataaccept);
-	send_msg(pcb, fsm, msg227, ip4_addr1(&pcb->local_ip), ip4_addr2(&pcb->local_ip), ip4_addr3(&pcb->local_ip), ip4_addr4(&pcb->local_ip), (fsm->dataport >> 8) & 0xff, (fsm->dataport) & 0xff);
+	send_msg(pcb, fsm, msg227, ip4_addr1(ip_2_ip4(&pcb->local_ip)), ip4_addr2(ip_2_ip4(&pcb->local_ip)), ip4_addr3(ip_2_ip4(&pcb->local_ip)), ip4_addr4(ip_2_ip4(&pcb->local_ip)), (fsm->dataport >> 8) & 0xff, (fsm->dataport) & 0xff);
 }
 
 static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
