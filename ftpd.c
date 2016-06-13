@@ -293,16 +293,6 @@ static void sfifo_close(sfifo_t *f)
 }
 
 /*
- * Empty FIFO buffer
- */
-static void sfifo_flush(sfifo_t *f)
-{
-	/* Reset positions */
-	f->readpos = 0;
-	f->writepos = 0;
-}
-
-/*
  * Write bytes to a FIFO
  * Return number of bytes written, or an error code
  */
@@ -333,41 +323,6 @@ static int sfifo_write(sfifo_t *f, const void *_buf, int len)
 	}
 	memcpy(f->buffer + i, buf, len);
 	f->writepos = i + len;
-
-	return total;
-}
-
-/*
- * Read bytes from a FIFO
- * Return number of bytes read, or an error code
- */
-static int sfifo_read(sfifo_t *f, void *_buf, int len)
-{
-	int total;
-	int i;
-	char *buf = (char *)_buf;
-
-	if(!f->buffer)
-		return -ENODEV;	/* No buffer! */
-
-	/* total = len = min(used, len) */
-	total = sfifo_used(f);
-	DBG(dbg_printf("sfifo_used() = %d\n",total));
-	if(len > total)
-		len = total;
-	else
-		total = len;
-
-	i = f->readpos;
-	if(i + len > f->size)
-	{
-		memcpy(buf, f->buffer + i, f->size - i);
-		buf += f->size - i;
-		len -= f->size - i;
-		i = 0;
-	}
-	memcpy(buf, f->buffer + i, len);
-	f->readpos = i + len;
 
 	return total;
 }
