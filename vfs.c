@@ -70,8 +70,8 @@ void vfs_close(vfs_t* vfs) {
 	if (vfs != &guard_for_the_whole_fs) {
 		/* Close a file */
 		f_close(vfs);
+		free(vfs);
 	}
-	free(vfs);
 }
 
 int vfs_write (void* buffer, int dummy, int len, vfs_file_t* file) {
