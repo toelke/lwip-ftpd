@@ -896,9 +896,9 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 			break;
 		if (start_port == port)
 			err = ERR_CLSD;
-		if (err == ERR_USE)
+		if (err == ERR_USE) {
 			continue;
-		if (err != ERR_OK) {
+		} else {
 			ftpd_dataclose(fsm->datapcb, fsm->datafs);
 			fsm->datapcb = NULL;
 			fsm->datafs = NULL;
