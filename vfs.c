@@ -129,7 +129,13 @@ void vfs_closedir(vfs_dir_t* dir) {
 	free(dir);
 }
 
-struct tm dummy;
+struct tm dummy = {
+	.tm_year = 1970,
+	.tm_mon  = 1,
+	.tm_mday = 1,
+	.tm_hour = 0,
+	.tm_min  = 0
+};
 struct tm* gmtime(time_t* c_t) {
 	return &dummy;
 }
