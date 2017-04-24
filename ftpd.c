@@ -449,8 +449,6 @@ static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 		fsm = fsd->msgfs;
 		msgpcb = fsd->msgpcb;
 
-		vfs_close(fsd->vfs_file);
-		fsd->vfs_file = NULL;
 		ftpd_dataclose(pcb, fsd);
 		fsm->datapcb = NULL;
 		fsm->datafs = NULL;
