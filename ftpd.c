@@ -945,7 +945,7 @@ static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 static void cmd_type(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
 	dbg_printf("Got TYPE -%s-\n", arg);
-	send_msg(pcb, fsm, msg502);
+	send_msg(pcb, fsm, msg200);
 }
 
 static void cmd_mode(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
