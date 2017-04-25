@@ -1204,16 +1204,12 @@ static err_t ftpd_msgsent(void *arg, struct tcp_pcb *pcb, u16_t len)
 {
 	struct ftpd_msgstate *fsm = arg;
 
-	if (pcb->state > ESTABLISHED)
-		return ERR_OK;
-
 	if ((sfifo_used(&fsm->fifo) == 0) && (fsm->state == FTPD_QUIT)) {
 		ftpd_msgclose(pcb, fsm);
 		return ERR_OK;
 	}
-
-	send_msgdata(pcb, fsm);
-
+	
+	if (pcb->state <= ESTABLISHED) send_msgdata(pcb, fsm);
 	return ERR_OK;
 }
 
