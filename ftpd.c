@@ -673,7 +673,6 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	sfifo_init(&fsm->datafs->fifo, 2000);
 
 	fsm->datapcb = tcp_new();
-	tcp_bind(fsm->datapcb, (ip_addr_t*)&pcb->local_ip, 20);
 	/* Tell TCP that this is the structure we wish to be passed for our
 	   callbacks. */
 	tcp_arg(fsm->datapcb, fsm->datafs);
