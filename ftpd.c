@@ -1264,7 +1264,7 @@ static err_t ftpd_msgrecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t 
 			free(text);
 		}
 		pbuf_free(p);
-	} else if (err == ERR_OK && p != NULL) {
+	} else if (err == ERR_OK && p == NULL) {
 	    ftpd_msgclose(pcb, fsm);
 	}
 
