@@ -343,6 +343,7 @@ struct ftpd_msgstate {
 	vfs_t *vfs;
 	struct ip4_addr dataip;
 	u16_t dataport;
+	struct tcp_pcb *datalistenpcb;
 	struct tcp_pcb *datapcb;
 	struct ftpd_datastate *datafs;
 	int passive;
@@ -368,6 +369,14 @@ static void ftpd_dataclose(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
 	tcp_arg(pcb, NULL);
 	tcp_sent(pcb, NULL);
 	tcp_recv(pcb, NULL);
+
+	if (fsd->msgfs->datalistenpcb) {
+		tcp_arg(fsd->msgfs->datalistenpcb, NULL);
+		tcp_accept(fsd->msgfs->datalistenpcb, NULL);
+		tcp_close(fsd->msgfs->datalistenpcb);
+		fsd->msgfs->datalistenpcb = NULL;
+	}
+
 	fsd->msgfs->datafs = NULL;
 	sfifo_close(&fsd->fifo);
 	free(fsd);
@@ -879,19 +888,26 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 	fsm->datafs = malloc(sizeof(struct ftpd_datastate));
 
 	if (fsm->datafs == NULL) {
+		dbg_printf("cmd_pasv: Out of memory\n");
 		send_msg(pcb, fsm, msg451);
 		return;
 	}
 	memset(fsm->datafs, 0, sizeof(struct ftpd_datastate));
 
-	fsm->datapcb = tcp_new();
-	if (!fsm->datapcb) {
+	if (sfifo_init(&fsm->datafs->fifo, 2000) != 0) {
 		free(fsm->datafs);
 		send_msg(pcb, fsm, msg451);
 		return;
 	}
 
-	sfifo_init(&fsm->datafs->fifo, 2000);
+	fsm->datalistenpcb = tcp_new();
+
+	if (fsm->datalistenpcb == NULL) {
+		free(fsm->datafs);
+		sfifo_close(&fsm->datafs->fifo);
+		send_msg(pcb, fsm, msg451);
+		return;
+	}
 
 	start_port = port;
 
@@ -902,7 +918,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 			port = 4096;
 
 		fsm->dataport = port;
-		err = tcp_bind(fsm->datapcb, (ip_addr_t*)&pcb->local_ip, fsm->dataport);
+		err = tcp_bind(fsm->datalistenpcb, (ip_addr_t*)&pcb->local_ip, fsm->dataport);
 		if (err == ERR_OK)
 			break;
 		if (start_port == port)
@@ -910,33 +926,32 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		if (err == ERR_USE) {
 			continue;
 		} else {
-			ftpd_dataclose(fsm->datapcb, fsm->datafs);
-			fsm->datapcb = NULL;
+			ftpd_dataclose(fsm->datalistenpcb, fsm->datafs);
+			fsm->datalistenpcb = NULL;
 			fsm->datafs = NULL;
 			return;
 		}
 	}
 
-	fsm->datafs->msgfs = fsm;
-
-	temppcb = tcp_listen(fsm->datapcb);
+	temppcb = tcp_listen(fsm->datalistenpcb);
 	if (!temppcb) {
-		ftpd_dataclose(fsm->datapcb, fsm->datafs);
-		fsm->datapcb = NULL;
+		dbg_printf("cmd_pasv: tcp_listen failed\n");
+		ftpd_dataclose(fsm->datalistenpcb, fsm->datafs);
+		fsm->datalistenpcb = NULL;
 		fsm->datafs = NULL;
 		return;
 	}
-	fsm->datapcb = temppcb;
+	fsm->datalistenpcb = temppcb;
 
 	fsm->passive = 1;
 	fsm->datafs->connected = 0;
+	fsm->datafs->msgfs = fsm;
 	fsm->datafs->msgpcb = pcb;
 
 	/* Tell TCP that this is the structure we wish to be passed for our
 	   callbacks. */
-	tcp_arg(fsm->datapcb, fsm->datafs);
-
-	tcp_accept(fsm->datapcb, ftpd_dataaccept);
+	tcp_arg(fsm->datalistenpcb, fsm->datafs);
+	tcp_accept(fsm->datalistenpcb, ftpd_dataaccept);
 	send_msg(pcb, fsm, msg227, ip4_addr1(ip_2_ip4(&pcb->local_ip)), ip4_addr2(ip_2_ip4(&pcb->local_ip)), ip4_addr3(ip_2_ip4(&pcb->local_ip)), ip4_addr4(ip_2_ip4(&pcb->local_ip)), (fsm->dataport >> 8) & 0xff, (fsm->dataport) & 0xff);
 }
 
@@ -946,7 +961,6 @@ static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		tcp_arg(fsm->datapcb, NULL);
 		tcp_sent(fsm->datapcb, NULL);
 		tcp_recv(fsm->datapcb, NULL);
-		tcp_arg(fsm->datapcb, NULL);
 		tcp_abort(pcb);
 		sfifo_close(&fsm->datafs->fifo);
 		free(fsm->datafs);
@@ -1119,7 +1133,7 @@ static struct ftpd_command ftpd_commands[] = {
 	{"RMD", cmd_rmd},
 	{"XRMD", cmd_rmd},
 	{"DELE", cmd_dele},
-	//{"PASV", cmd_pasv},
+	{"PASV", cmd_pasv},
 	{NULL, NULL}
 };
 
