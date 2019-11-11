@@ -664,15 +664,29 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 	fsm->datafs = malloc(sizeof(struct ftpd_datastate));
 
 	if (fsm->datafs == NULL) {
+		dbg_printf("open_dataconnection: Out of memory\n");
 		send_msg(pcb, fsm, msg451);
 		return 1;
 	}
 	memset(fsm->datafs, 0, sizeof(struct ftpd_datastate));
 	fsm->datafs->msgfs = fsm;
 	fsm->datafs->msgpcb = pcb;
-	sfifo_init(&fsm->datafs->fifo, 2000);
+
+	if (sfifo_init(&fsm->datafs->fifo, 2000) != 0) {
+		free(fsm->datafs);
+		send_msg(pcb, fsm, msg451);
+		return 1;
+	}
 
 	fsm->datapcb = tcp_new();
+
+	if (fsm->datapcb == NULL) {
+		sfifo_close(&fsm->datafs->fifo);
+		free(fsm->datafs);
+		send_msg(pcb, fsm, msg451);
+		return 1;
+	}
+
 	/* Tell TCP that this is the structure we wish to be passed for our
 	   callbacks. */
 	tcp_arg(fsm->datapcb, fsm->datafs);
@@ -973,6 +987,7 @@ static void cmd_rnfr(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 		free(fsm->renamefrom);
 	fsm->renamefrom = malloc(strlen(arg) + 1);
 	if (fsm->renamefrom == NULL) {
+		dbg_printf("cmd_rnfr: Out of memory\n");
 		send_msg(pcb, fsm, msg451);
 		return;
 	}
@@ -1314,10 +1329,14 @@ static err_t ftpd_msgaccept(void *arg, struct tcp_pcb *pcb, err_t err)
 	memset(fsm, 0, sizeof(struct ftpd_msgstate));
 
 	/* Initialize the structure. */
-	sfifo_init(&fsm->fifo, 2000);
+	if (sfifo_init(&fsm->fifo, 2000) != 0) {
+		free(fsm);
+		return ERR_MEM;
+	}
 	fsm->state = FTPD_IDLE;
 	fsm->vfs = vfs_openfs();
-	if (!fsm->vfs) {
+	if (fsm->vfs == NULL) {
+		sfifo_close(&fsm->fifo);
 		free(fsm);
 		return ERR_CLSD;
 	}
