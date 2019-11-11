@@ -187,7 +187,7 @@ static const char *month_table[12] = {
 	"Sep",
 	"Oct",
 	"Nov",
-	"Dez"
+	"Dec"
 };
 
 /*
