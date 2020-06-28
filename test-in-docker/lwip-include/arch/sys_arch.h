@@ -1,0 +1,4 @@
+#ifndef LWIP_ARCH_SYS_ARCH_H
+#define LWIP_ARCH_SYS_ARCH_H
+
+#endif /* LWIP_ARCH_SYS_ARCH_H */
