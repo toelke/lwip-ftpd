@@ -27,17 +27,29 @@
 #ifndef INCLUDE_VFS_H
 #define INCLUDE_VFS_H
 
-#include <src/ff.h>
+#include <source/ff.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define vfs_load_plugin(x)
 #define bcopy(src, dest, len) memmove(dest, src, len)
 
-
+#ifndef __time_t_defined
 typedef struct {
 	short date;
 	short time;
 } time_t;
+
+struct tm {
+  int tm_year;
+  int tm_mon;
+  int tm_mday;
+  int tm_hour;
+  int tm_min;
+  int tm_sec;
+};
+#endif // __time_t_defined
 typedef DIR vfs_dir_t;
 typedef FIL vfs_file_t;
 typedef struct {
@@ -49,14 +61,6 @@ typedef struct {
 	char name[13];
 } vfs_dirent_t;
 typedef FIL vfs_t;
-
-struct tm {
-  int tm_year;
-  int tm_mon;
-  int tm_mday;
-  int tm_hour;
-  int tm_min;
-};
 
 #define time(x)
 #define vfs_eof f_eof
@@ -80,6 +84,6 @@ void vfs_close(vfs_t* vfs);
 int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st);
 void vfs_closedir(vfs_dir_t* dir);
 vfs_dir_t* vfs_opendir(vfs_t* vfs, const char* path);
-struct tm* gmtime(time_t *c_t);
+struct tm* gmtime(const time_t *c_t);
 
 #endif /* INCLUDE_VFS_H */

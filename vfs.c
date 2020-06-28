@@ -25,9 +25,10 @@
  */
 
 #include "vfs.h"
-#include <src/ff.h>
+#include <source/ff.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 /* dirent that will be given to callers;
  * note: both APIs assume that only one dirent ever exists
@@ -65,8 +66,15 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st) {
 	}
 	st->st_size = f.fsize;
 	st->st_mode = f.fattrib;
-	st->st_mtime.date = f.fdate;
-	st->st_mtime.time = f.ftime;
+	struct tm tm = {
+		.tm_sec = 2*(f.ftime & 0x1f),
+		.tm_min = (f.ftime >> 5) & 0x3f,
+		.tm_hour = (f.ftime >> 11) & 0x1f,
+		.tm_mday = f.fdate & 0x1f,
+		.tm_mon = (f.fdate >> 5) & 0xf,
+		.tm_year = 80 + (f.fdate >> 9) & 0x7f,
+	};
+	st->st_mtime = mktime(&tm);
 	return 0;
 }
 
@@ -136,6 +144,6 @@ struct tm dummy = {
 	.tm_hour = 0,
 	.tm_min  = 0
 };
-struct tm* gmtime(time_t* c_t) {
+struct tm* gmtime(const time_t* c_t) {
 	return &dummy;
 }

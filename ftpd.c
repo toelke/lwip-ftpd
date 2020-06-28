@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
+#include <time.h>
 
 #include "vfs.h"
 
