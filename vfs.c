@@ -134,7 +134,10 @@ vfs_dir_t* vfs_opendir(vfs_t* vfs, const char* path) {
 }
 
 void vfs_closedir(vfs_dir_t* dir) {
-	free(dir);
+	if (dir) {
+		f_closedir(dir);
+		free(dir);
+	}
 }
 
 struct tm dummy = {
