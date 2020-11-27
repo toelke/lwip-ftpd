@@ -1,3 +1,5 @@
+#define TCP_MSS                         1500
+#define TCP_WND                         65535
 #define NO_SYS                          1
 #define SYS_LIGHTWEIGHT_PROT            0
 
