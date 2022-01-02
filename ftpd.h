@@ -34,6 +34,15 @@
 #ifndef __FTPD_H__
 #define __FTPD_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 void ftpd_init(void);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif				/* __FTPD_H__ */
