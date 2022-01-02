@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Philipp T�lke
+/* Copyright (c) 2013, Philipp Tölke
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
