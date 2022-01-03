@@ -1,4 +1,4 @@
-/* Copyright (c) 2013, Philipp Tölke
+/* Copyright (c) 2013, Philipp TÃ¶lke
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,11 @@
 
 #ifndef INCLUDE_VFS_H
 #define INCLUDE_VFS_H
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #include <source/ff.h>
 #include <stddef.h>
@@ -85,5 +90,9 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st);
 void vfs_closedir(vfs_dir_t* dir);
 vfs_dir_t* vfs_opendir(vfs_t* vfs, const char* path);
 struct tm* gmtime(const time_t *c_t);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* INCLUDE_VFS_H */
