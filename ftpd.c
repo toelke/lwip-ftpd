@@ -1392,10 +1392,10 @@ void ftpd_init(void)
 	vfs_load_plugin(vfs_default_fs);
 
 	pcb = tcp_new();
-	LWIP_DEBUGF(FTPD_DEBUG, ("ftpd_init: pcb: %x\n", pcb));
+	LWIP_DEBUGF(FTPD_DEBUG, ("ftpd_init: pcb: %lx\n", (unsigned long) pcb));
 	int r = tcp_bind(pcb, IP_ADDR_ANY, 21);
 	LWIP_DEBUGF(FTPD_DEBUG, ("ftpd_init: tcp_bind: %d\n", r));
 	pcb = tcp_listen(pcb);
-	LWIP_DEBUGF(FTPD_DEBUG, ("ftpd_init: listen-pcb: %x\n", pcb));
+	LWIP_DEBUGF(FTPD_DEBUG, ("ftpd_init: listen-pcb: %lx\n", (unsigned long) pcb));
 	tcp_accept(pcb, ftpd_msgaccept);
 }

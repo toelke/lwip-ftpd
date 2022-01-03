@@ -64,10 +64,10 @@ DRESULT disk_write(BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count) {
 	if (pdrv != 0) return RES_NOTRDY;
 
 	size_t r = lseek(data, 512*sector, SEEK_SET);
-	printf("disk_write: lseek returns %d\n", r);
+	printf("disk_write: lseek returns %u\n", (unsigned) r);
 
 	r = write(data, buff, 512 * count);
-	printf("disk_write(%d): write returns %d\n", count, r);
+	printf("disk_write(%u): write returns %u\n", count, (unsigned) r);
 
 	return RES_OK;
 }
@@ -76,10 +76,10 @@ DRESULT disk_read(BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
 	if (pdrv != 0) return RES_NOTRDY;
 
 	size_t r = lseek(data, 512*sector, SEEK_SET);
-	printf("disk_read: lseek returns %d\n", r);
+	printf("disk_read: lseek returns %u\n", (unsigned) r);
 
 	r = read(data, buff, 512 * count);
-	printf("disk_read(%d): read returns %d\n", count, r);
+	printf("disk_read(%u): read returns %u\n", count, (unsigned) r);
 
 	return RES_OK;
 }
