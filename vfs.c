@@ -74,7 +74,7 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st) {
 		.tm_hour = (f.ftime >> 11) & 0x1f,
 		.tm_mday = f.fdate & 0x1f,
 		.tm_mon = (f.fdate >> 5) & 0xf,
-		.tm_year = 80 + (f.fdate >> 9) & 0x7f,
+		.tm_year = 80 + ((f.fdate >> 9) & 0x7f),
 	};
 	st->st_mtime = mktime(&tm);
 	return 0;

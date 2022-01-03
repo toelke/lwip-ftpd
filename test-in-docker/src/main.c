@@ -120,7 +120,7 @@ static err_t init_callback(struct netif* netif) {
 	return ERR_OK;
 }
 
-int main(size_t argc, char **argv) {
+int main(int argc, char **argv) {
 	pcap_t *pcap = pcap_open_live("eth0", 65536, 1, 100, NULL);
 	char errbuf[PCAP_ERRBUF_SIZE];
 	int r = pcap_setnonblock(pcap, 1, errbuf);

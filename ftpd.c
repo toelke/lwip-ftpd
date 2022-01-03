@@ -976,12 +976,12 @@ static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 static void cmd_type(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
 	LWIP_DEBUGF(FTPD_DEBUG, ("Got TYPE -%s-\n", arg));
-	
+
 	if(strcmp(arg, "I") != 0) {
 		send_msg(pcb, fsm, msg502);
 		return;
 	}
-	
+
 	send_msg(pcb, fsm, msg200);
 }
 
@@ -1241,7 +1241,7 @@ static err_t ftpd_msgsent(void *arg, struct tcp_pcb *pcb, u16_t len)
 		ftpd_msgclose(pcb, fsm);
 		return ERR_OK;
 	}
-	
+
 	if (pcb->state <= ESTABLISHED) send_msgdata(pcb, fsm);
 	return ERR_OK;
 }
