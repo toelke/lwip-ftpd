@@ -525,6 +525,7 @@ static void send_next_directory(struct ftpd_datastate *fsd, struct tcp_pcb *pcb,
 static err_t ftpd_datasent(void *arg, struct tcp_pcb *pcb, u16_t len)
 {
 	struct ftpd_datastate *fsd = arg;
+	(void) len; /* suppress unused warning */
 
 	switch (fsd->msgfs->state) {
 	case FTPD_LIST:
@@ -587,6 +588,7 @@ static err_t ftpd_datarecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t
 static err_t ftpd_dataconnected(void *arg, struct tcp_pcb *pcb, err_t err)
 {
 	struct ftpd_datastate *fsd = arg;
+	(void) err; /* suppress unused warning */
 
 	fsd->msgfs->datapcb = pcb;
 	fsd->connected = 1;
@@ -621,6 +623,8 @@ static err_t ftpd_dataconnected(void *arg, struct tcp_pcb *pcb, err_t err)
 static err_t ftpd_dataaccept(void *arg, struct tcp_pcb *pcb, err_t err)
 {
 	struct ftpd_datastate *fsd = arg;
+
+	(void) err; /* suppress unused warning */
 
 	fsd->msgfs->datapcb = pcb;
 	fsd->connected = 1;
@@ -698,6 +702,8 @@ static int open_dataconnection(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 
 static void cmd_user(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
+
 	send_msg(pcb, fsm, msg331);
 	fsm->state = FTPD_PASS;
 	/*
@@ -708,6 +714,7 @@ static void cmd_user(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 static void cmd_pass(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	send_msg(pcb, fsm, msg230);
 	fsm->state = FTPD_IDLE;
 	/*
@@ -734,6 +741,7 @@ static void cmd_port(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 static void cmd_quit(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	send_msg(pcb, fsm, msg221);
 	fsm->state = FTPD_QUIT;
 }
@@ -749,6 +757,7 @@ static void cmd_cwd(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *
 
 static void cmd_cdup(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	if (!vfs_chdir(fsm->vfs, "..")) {
 		send_msg(pcb, fsm, msg250);
 	} else {
@@ -759,6 +768,7 @@ static void cmd_cdup(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 static void cmd_pwd(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
 	char *path;
+	(void) arg; /* suppress unused warning */
 
 	if ((path = vfs_getcwd(fsm->vfs, NULL, 0))) {
 		send_msg(pcb, fsm, msg257PWD, path);
@@ -770,6 +780,7 @@ static void cmd_list_common(const char *arg, struct tcp_pcb *pcb, struct ftpd_ms
 {
 	vfs_dir_t *vfs_dir;
 	char *cwd;
+	(void) arg; /* suppress unused warning */
 
 	cwd = vfs_getcwd(fsm->vfs, NULL, 0);
 	if ((!cwd)) {
@@ -858,11 +869,13 @@ static void cmd_stor(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 static void cmd_noop(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	send_msg(pcb, fsm, msg200);
 }
 
 static void cmd_syst(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	send_msg(pcb, fsm, msg214SYST, "UNIX");
 }
 
@@ -871,6 +884,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 	static u16_t port = 4096;
 	static u16_t start_port = 4096;
 	struct tcp_pcb *temppcb;
+	(void) arg; /* suppress unused warning */
 
 	/* Allocate memory for the structure that holds the state of the
 	   connection. */
@@ -946,6 +960,7 @@ static void cmd_pasv(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate 
 
 static void cmd_abrt(const char *arg, struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 {
+	(void) arg; /* suppress unused warning */
 	if (fsm->datafs != NULL) {
 		tcp_arg(fsm->datapcb, NULL);
 		tcp_sent(fsm->datapcb, NULL);
@@ -1220,6 +1235,7 @@ static void ftpd_msgclose(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 static err_t ftpd_msgsent(void *arg, struct tcp_pcb *pcb, u16_t len)
 {
 	struct ftpd_msgstate *fsm = arg;
+	(void) len; /* suppress unused warning */
 
 	if ((sfifo_used(&fsm->fifo) == 0) && (fsm->state == FTPD_QUIT)) {
 		ftpd_msgclose(pcb, fsm);
@@ -1292,6 +1308,7 @@ static err_t ftpd_msgrecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t 
 static err_t ftpd_msgpoll(void *arg, struct tcp_pcb *pcb)
 {
 	struct ftpd_msgstate *fsm = arg;
+	(void) pcb; /* suppress unused warning */
 
 	if (fsm == NULL)
 		return ERR_OK;
@@ -1321,6 +1338,8 @@ static err_t ftpd_msgaccept(void *arg, struct tcp_pcb *pcb, err_t err)
 {
 	LWIP_PLATFORM_DIAG(("ftpd_msgaccept called"));
 	struct ftpd_msgstate *fsm;
+	(void) err; /* suppress unused warning */
+	(void) arg;
 
 	/* Allocate memory for the structure that holds the state of the
 	   connection. */

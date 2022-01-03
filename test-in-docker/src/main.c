@@ -132,6 +132,9 @@ int main(size_t argc, char **argv) {
 	FATFS fs;
 	unsigned char *buf[4096];
 
+	(void) argc; /* suppress unused warning */
+	(void) argv;
+
 	{
 	FRESULT r = f_mount(&fs, "", 1);
 	printf("f_mount returns %d\n", r);
