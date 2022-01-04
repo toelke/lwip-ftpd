@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	FATFS fs;
+	FATFS fs = {};
 	unsigned char *buf[4096];
 
 	(void) argc; /* suppress unused warning */
