@@ -18,6 +18,8 @@ include_directories(
 
 include(${LWIP_DIR}/src/Filelists.cmake)
 
+add_compile_options(-Wall -Wextra -Werror)
+
 add_executable(lwip-runner
 	${CMAKE_CURRENT_SOURCE_DIR}/main.c
 	${CMAKE_CURRENT_SOURCE_DIR}/../lwip-include/sys_arch.c

@@ -39,6 +39,7 @@ FIL guard_for_the_whole_fs;
 
 int vfs_read (void* buffer, int dummy, int len, vfs_file_t* file) {
 	unsigned int bytesread;
+	(void) dummy; /* suppress unused warning */
 	FRESULT r = f_read(file, buffer, len, &bytesread);
 	if (r != FR_OK) return 0;
 	return bytesread;
@@ -61,6 +62,7 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st) {
 #if _USE_LFN
 	f.lfname = NULL;
 #endif
+    (void) vfs; /* suppress unused warning */
 	if (FR_OK != f_stat(filename, &f)) {
 		return 1;
 	}
@@ -72,7 +74,7 @@ int vfs_stat(vfs_t* vfs, const char* filename, vfs_stat_t* st) {
 		.tm_hour = (f.ftime >> 11) & 0x1f,
 		.tm_mday = f.fdate & 0x1f,
 		.tm_mon = (f.fdate >> 5) & 0xf,
-		.tm_year = 80 + (f.fdate >> 9) & 0x7f,
+		.tm_year = 80 + ((f.fdate >> 9) & 0x7f),
 	};
 	st->st_mtime = mktime(&tm);
 	return 0;
@@ -88,6 +90,8 @@ void vfs_close(vfs_t* vfs) {
 
 int vfs_write (void* buffer, int dummy, int len, vfs_file_t* file) {
 	unsigned int byteswritten;
+	(void) dummy; /* suppress unused warning */
+
 	FRESULT r = f_write(file, buffer, len, &byteswritten);
 	if (r != FR_OK) return 0;
 	return byteswritten;
@@ -100,6 +104,8 @@ vfs_t* vfs_openfs() {
 vfs_file_t* vfs_open(vfs_t* vfs, const char* filename, const char* mode) {
 	vfs_file_t *f = malloc(sizeof(vfs_file_t));
 	BYTE flags = 0;
+	(void) vfs; /* suppress unused warning */
+
 	while (*mode != '\0') {
 		if (*mode == 'r') flags |= FA_READ;
 		if (*mode == 'w') flags |= FA_WRITE | FA_CREATE_ALWAYS;
@@ -116,6 +122,10 @@ vfs_file_t* vfs_open(vfs_t* vfs, const char* filename, const char* mode) {
 char* vfs_getcwd(vfs_t* vfs, void* dummy1, int dummy2) {
 	char* cwd = malloc(255);
 	FRESULT r = f_getcwd(cwd, 255);
+	(void) dummy1; /* suppress unused warning */
+	(void) dummy2;
+	(void) vfs;
+
 	if (r != FR_OK) {
 		free(cwd);
 		return NULL;
@@ -126,6 +136,7 @@ char* vfs_getcwd(vfs_t* vfs, void* dummy1, int dummy2) {
 vfs_dir_t* vfs_opendir(vfs_t* vfs, const char* path) {
 	vfs_dir_t* dir = malloc(sizeof *dir);
 	FRESULT r = f_opendir(dir, path);
+	(void) vfs; /* suppress unused warning */
 	if (FR_OK != r) {
 		free(dir);
 		return NULL;
@@ -148,5 +159,6 @@ struct tm dummy = {
 	.tm_min  = 0
 };
 struct tm* gmtime(const time_t* c_t) {
+	(void) c_t;
 	return &dummy;
 }

@@ -64,10 +64,10 @@ DRESULT disk_write(BYTE pdrv, const BYTE* buff, LBA_t sector, UINT count) {
 	if (pdrv != 0) return RES_NOTRDY;
 
 	size_t r = lseek(data, 512*sector, SEEK_SET);
-	printf("disk_write: lseek returns %d\n", r);
+	printf("disk_write: lseek returns %u\n", (unsigned) r);
 
 	r = write(data, buff, 512 * count);
-	printf("disk_write(%d): write returns %d\n", count, r);
+	printf("disk_write(%u): write returns %u\n", count, (unsigned) r);
 
 	return RES_OK;
 }
@@ -76,10 +76,10 @@ DRESULT disk_read(BYTE pdrv, BYTE* buff, LBA_t sector, UINT count) {
 	if (pdrv != 0) return RES_NOTRDY;
 
 	size_t r = lseek(data, 512*sector, SEEK_SET);
-	printf("disk_read: lseek returns %d\n", r);
+	printf("disk_read: lseek returns %u\n", (unsigned) r);
 
 	r = read(data, buff, 512 * count);
-	printf("disk_read(%d): read returns %d\n", count, r);
+	printf("disk_read(%u): read returns %u\n", count, (unsigned) r);
 
 	return RES_OK;
 }
@@ -120,7 +120,7 @@ static err_t init_callback(struct netif* netif) {
 	return ERR_OK;
 }
 
-int main(size_t argc, char **argv) {
+int main(int argc, char **argv) {
 	pcap_t *pcap = pcap_open_live("eth0", 65536, 1, 100, NULL);
 	char errbuf[PCAP_ERRBUF_SIZE];
 	int r = pcap_setnonblock(pcap, 1, errbuf);
@@ -131,6 +131,9 @@ int main(size_t argc, char **argv) {
 
 	FATFS fs;
 	unsigned char *buf[4096];
+
+	(void) argc; /* suppress unused warning */
+	(void) argv;
 
 	{
 	FRESULT r = f_mount(&fs, "", 1);
