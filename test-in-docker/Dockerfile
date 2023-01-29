@@ -1,4 +1,4 @@
-FROM debian:10 AS builder
+FROM debian:11 AS builder
 
 RUN apt update && apt install -y unzip libpcap-dev build-essential git cmake && rm -rf /var/lib/dpkg/lists/*
 
@@ -16,7 +16,7 @@ WORKDIR /build
 
 RUN cmake /src/lwip-ftpd/test-in-docker/src && make -j
 
-FROM debian:10 AS runner
+FROM debian:11 AS runner
 
 RUN apt update && apt install -y libpcap0.8 valgrind && rm -rf /var/lib/dpkg/lists/*
 
