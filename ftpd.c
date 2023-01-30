@@ -373,6 +373,20 @@ static void ftpd_dataclose(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
 	tcp_close(pcb);
 }
 
+static void close_with_message(struct ftpd_datastate *fsd, struct tcp_pcb *pcb, char* msg) {
+	struct ftpd_msgstate *fsm;
+	struct tcp_pcb *msgpcb;
+
+	fsm = fsd->msgfs;
+	msgpcb = fsd->msgpcb;
+	ftpd_dataclose(pcb, fsd);
+	fsm->datapcb = NULL;
+	fsm->datafs = NULL;
+	fsm->state = FTPD_IDLE;
+	send_msg(msgpcb, fsm, msg);
+}
+
+
 static void send_data(struct tcp_pcb *pcb, struct ftpd_datastate *fsd)
 {
 	err_t err;
@@ -437,21 +451,11 @@ static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 		sfifo_write(&fsd->fifo, buffer, len);
 		send_data(pcb, fsd);
 	} else {
-		struct ftpd_msgstate *fsm;
-		struct tcp_pcb *msgpcb;
-
 		if (sfifo_used(&fsd->fifo) > 0) {
 			send_data(pcb, fsd);
 			return;
 		}
-		fsm = fsd->msgfs;
-		msgpcb = fsd->msgpcb;
-
-		ftpd_dataclose(pcb, fsd);
-		fsm->datapcb = NULL;
-		fsm->datafs = NULL;
-		fsm->state = FTPD_IDLE;
-		send_msg(msgpcb, fsm, msg226);
+		close_with_message(fsd, pcb, msg226);
 		return;
 	}
 }
@@ -500,23 +504,14 @@ static void send_next_directory(struct ftpd_datastate *fsd, struct tcp_pcb *pcb,
 			fsd->vfs_dirent = NULL;
 		}
 	} else {
-		struct ftpd_msgstate *fsm;
-		struct tcp_pcb *msgpcb;
-
 		if (sfifo_used(&fsd->fifo) > 0) {
 			send_data(pcb, fsd);
 			return;
 		}
-		fsm = fsd->msgfs;
-		msgpcb = fsd->msgpcb;
 
 		vfs_closedir(fsd->vfs_dir);
 		fsd->vfs_dir = NULL;
-		ftpd_dataclose(pcb, fsd);
-		fsm->datapcb = NULL;
-		fsm->datafs = NULL;
-		fsm->state = FTPD_IDLE;
-		send_msg(msgpcb, fsm, msg226);
+		close_with_message(fsd, pcb, msg226);
 		return;
 	}
 	}
@@ -567,19 +562,9 @@ static err_t ftpd_datarecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t
 		pbuf_free(p);
 	}
 	if (err == ERR_OK && p == NULL) {
-		struct ftpd_msgstate *fsm;
-		struct tcp_pcb *msgpcb;
-
-		fsm = fsd->msgfs;
-		msgpcb = fsd->msgpcb;
-
 		vfs_close(fsd->vfs_file);
 		fsd->vfs_file = NULL;
-		ftpd_dataclose(pcb, fsd);
-		fsm->datapcb = NULL;
-		fsm->datafs = NULL;
-		fsm->state = FTPD_IDLE;
-		send_msg(msgpcb, fsm, msg226);
+		close_with_message(fsd, pcb, msg226);
 	}
 
 	return ERR_OK;
