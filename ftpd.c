@@ -552,8 +552,12 @@ static err_t ftpd_datarecv(void *arg, struct tcp_pcb *pcb, struct pbuf *p, err_t
 
 			len = vfs_write(q->payload, 1, q->len, fsd->vfs_file);
 			tot_len += len;
-			if (len != q->len)
+			if (len != q->len) {
+				vfs_close(fsd->vfs_file);
+				fsd->vfs_file = NULL;
+				close_with_message(fsd, pcb, msg553);
 				break;
+			}
 		}
 
 		/* Inform TCP that we have taken the data. */
