@@ -1,4 +1,4 @@
-FROM debian:trixie-20260406 AS builder
+FROM debian:trixie-20260421 AS builder
 
 RUN apt update && apt install -y unzip libpcap-dev build-essential git cmake && rm -rf /var/lib/dpkg/lists/*
 
@@ -16,7 +16,7 @@ WORKDIR /build
 
 RUN cmake /src/lwip-ftpd/test-in-docker/src && make -j
 
-FROM debian:trixie-20260406 AS runner
+FROM debian:trixie-20260421 AS runner
 
 RUN apt update && apt install -y libpcap0.8 valgrind && rm -rf /var/lib/dpkg/lists/*
 
