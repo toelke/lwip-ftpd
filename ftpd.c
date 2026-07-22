@@ -430,7 +430,7 @@ static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 		return;
 
 	if (fsd->vfs_file) {
-		char buffer[2048];
+		static char buffer[2048];
 		int len;
 
 		len = sfifo_space(&fsd->fifo);
@@ -462,7 +462,7 @@ static void send_file(struct ftpd_datastate *fsd, struct tcp_pcb *pcb)
 
 static void send_next_directory(struct ftpd_datastate *fsd, struct tcp_pcb *pcb, int shortlist)
 {
-	char buffer[1024];
+	static char buffer[1024];
 	int len;
 
 	while (1) {
@@ -1170,7 +1170,7 @@ static void send_msgdata(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm)
 static void send_msg(struct tcp_pcb *pcb, struct ftpd_msgstate *fsm, char *msg, ...)
 {
 	va_list arg;
-	char buffer[1024];
+	static char buffer[1024];
 	int len;
 
 	va_start(arg, msg);
